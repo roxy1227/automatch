@@ -6,6 +6,10 @@
   pip install -r requirements.txt
 ```
 
+```commandline
+  python app/main.py
+```
+
 ### build
 使用pyinstaller
 ```cmd
