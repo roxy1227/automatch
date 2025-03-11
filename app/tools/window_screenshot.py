@@ -408,37 +408,49 @@ class WindowScreenshot:
         """
         获取所有可见窗口的信息。
         返回：
-            每个窗口信息的字典列表
+            窗口信息的字典列表
         """
         windows = self.get_window_handles_by_process_name("")
         result = []
         for hwnd, title, pid in windows:
             if title:  # 仅包括有标题的窗口
-                result.append({
+                window_info = {
                     "handle": hwnd,
                     "title": title,
                     "process_id": pid
-                })
+                }
+                result.append(window_info)
         return result
 
-    def find_window(self, title_substring: str) -> List[Dict[str, Any]]:
+    def get_formatted_windows(self) -> None:
         """
-        查找与标题子字符串匹配的窗口。
+        获取所有可见窗口的信息，输出格式化后的窗口信息
+        """
+        windows = self.get_all_windows()
+        print(self.format_window_info(windows))
+
+    @staticmethod
+    def format_window_info(windows: List[Dict[str, Any]]) -> str:
+        """
+        将窗口信息列表格式化为字符串。
         参数：
-            title_substring: 要在窗口标题中搜索的子字符串
+            windows: 窗口信息的字典列表
         返回：
-            匹配窗口信息的字典列表
+            格式化的字符串
         """
-        windows = self.get_window_handles_by_title(title_substring)
-        result = []
-        for hwnd, title in windows:
-            _, pid = win32process.GetWindowThreadProcessId(hwnd)
-            result.append({
-                "handle": hwnd,
-                "title": title,
-                "process_id": pid
-            })
-        return result
+        if not windows:
+            return "未找到任何可见窗口。\n"
+
+        formatted_output = "当前可见窗口信息如下：\n"
+        for idx, window in enumerate(windows, start=1):
+            formatted_output += (
+                f"窗口 {idx}:\n"
+                f"  句柄 (Handle): {window['handle']}\n"
+                f"  标题 (Title): {window['title']}\n"
+                f"  进程ID (Process ID): {window['process_id']}\n"
+            )
+        return formatted_output
+
 
 # 辅助函数
 def list_all_windows(verbose: bool = True) -> List[Dict[str, Any]]:
